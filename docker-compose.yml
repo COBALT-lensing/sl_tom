@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: "localdev"
+      POSTGRES_USER: "sltom"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+  rabbitmq:
+    image: rabbitmq:3
+    environment:
+      RABBITMQ_DEFAULT_VHOST: "sltom"
+  app:
+    build:
+      context: .
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./local.env
