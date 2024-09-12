@@ -5,8 +5,9 @@ name = "pypi"
 
 [packages]
 tomtoolkit = "*"
+importlib-metadata = "<8.5"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12"
+python_version = "3.10"
