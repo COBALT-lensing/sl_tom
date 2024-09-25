@@ -192,7 +192,7 @@ class TessSingleTargetDataService(stds.BaseSingleTargetDataService):
                         local_path=fp.name,
                         cache=False,
                     ),
-                    dp.data = File(fp)
+                    dp.data = File(fp, name=f"{data_product_name}.fits")
                     dp.save()
                     logger.info(
                         f"Created dataproduct {data_product_name} from TESS (MAST) query"
