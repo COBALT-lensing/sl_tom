@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 tomtoolkit = "*"
 importlib-metadata = "*"
+lightkurve = "*"
 
 [dev-packages]
 
