@@ -8,6 +8,7 @@ tomtoolkit = "*"
 importlib-metadata = "*"
 lightkurve = "*"
 panoptes-client = "*"
+python-dateutil = "*"
 
 [dev-packages]
 

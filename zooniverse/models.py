@@ -1,3 +1,57 @@
 from django.db import models
 
-# Create your models here.
+
+class ZooniverseSurvey(models.Model):
+    name = models.CharField(max_length=50)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class ZooniverseTarget(models.Model):
+    survey = models.ForeignKey(ZooniverseSurvey)
+    identifier = models.CharField(max_length=128)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class ZooniverseSubject(models.Model):
+    subject_id = models.BigIntegerField(unique=True)
+
+    target = models.ForeignKey(ZooniverseTarget)
+    sequence = models.CharField(max_length=50, help_text="Sector, data release, etc.")
+    data_url = models.URLField(null=True, blank=True)
+    start_time = models.DateTimeField(help_text="Earliest time in the light curve")
+    end_time = models.DateTimeField(help_text="Latest tie in the light curve")
+
+    metadata = models.JSONField()
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class ZooniverseClassification(models.Model):
+    classification_id = models.BigIntegerField(unique=True)
+    subject = models.ForeignKey(ZooniverseSubject)
+
+    user_id = models.BigIntegerField()
+    timestamp = models.DateTimeField()
+    annotation = models.JSONField()
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class ZooniverseTargetReduction(models.Model):
+    """
+    Reduced classifications for targets.
+    """
+
+    target = models.ForeignKey(ZooniverseTarget)
+    classifications = models.ManyToManyField(ZooniverseClassification)
+
+    reduced_annotations = models.JSONField()
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
