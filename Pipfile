@@ -9,6 +9,7 @@ importlib-metadata = "*"
 lightkurve = "*"
 panoptes-client = "*"
 python-dateutil = "*"
+tqdm = "*"
 
 [dev-packages]
 

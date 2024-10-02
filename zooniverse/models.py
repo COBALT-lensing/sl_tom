@@ -22,8 +22,12 @@ class ZooniverseSubject(models.Model):
 
     sequence = models.CharField(max_length=50, help_text="Sector, data release, etc.")
     data_url = models.URLField(null=True, blank=True)
-    start_time = models.DateTimeField(help_text="Earliest time in the light curve")
-    end_time = models.DateTimeField(help_text="Latest tie in the light curve")
+    start_time = models.DateTimeField(
+        null=True, blank=True, help_text="Earliest time in the light curve"
+    )
+    end_time = models.DateTimeField(
+        null=True, blank=True, help_text="Latest time in the light curve"
+    )
 
     metadata = models.JSONField()
 
