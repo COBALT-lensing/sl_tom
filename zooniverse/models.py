@@ -9,7 +9,7 @@ class ZooniverseSurvey(models.Model):
 
 
 class ZooniverseTarget(models.Model):
-    survey = models.ForeignKey(ZooniverseSurvey)
+    survey = models.ForeignKey(ZooniverseSurvey, on_delete=models.CASCADE)
     identifier = models.CharField(max_length=128)
 
     created = models.DateTimeField(auto_now_add=True)
@@ -18,8 +18,8 @@ class ZooniverseTarget(models.Model):
 
 class ZooniverseSubject(models.Model):
     subject_id = models.BigIntegerField(unique=True)
+    target = models.ForeignKey(ZooniverseTarget, on_delete=models.CASCADE)
 
-    target = models.ForeignKey(ZooniverseTarget)
     sequence = models.CharField(max_length=50, help_text="Sector, data release, etc.")
     data_url = models.URLField(null=True, blank=True)
     start_time = models.DateTimeField(help_text="Earliest time in the light curve")
@@ -33,7 +33,7 @@ class ZooniverseSubject(models.Model):
 
 class ZooniverseClassification(models.Model):
     classification_id = models.BigIntegerField(unique=True)
-    subject = models.ForeignKey(ZooniverseSubject)
+    subject = models.ForeignKey(ZooniverseSubject, on_delete=models.CASCADE)
 
     user_id = models.BigIntegerField()
     timestamp = models.DateTimeField()
@@ -48,7 +48,7 @@ class ZooniverseTargetReduction(models.Model):
     Reduced classifications for targets.
     """
 
-    target = models.ForeignKey(ZooniverseTarget)
+    target = models.ForeignKey(ZooniverseTarget, on_delete=models.CASCADE)
     classifications = models.ManyToManyField(ZooniverseClassification)
 
     reduced_annotations = models.JSONField()
