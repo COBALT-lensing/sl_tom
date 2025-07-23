@@ -21,4 +21,4 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/COBALT-lensing/sl_tom:latest
+            ghcr.io/cobalt-lensing/sl_tom:latest
