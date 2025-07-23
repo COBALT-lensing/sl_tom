@@ -11,6 +11,7 @@ panoptes-client = "*"
 python-dateutil = "*"
 tqdm = "*"
 tornado = "*"
+gunicorn = "*"
 
 [dev-packages]
 
