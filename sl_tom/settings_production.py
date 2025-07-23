@@ -23,10 +23,10 @@ DATABASES = {
     }
 }
 
-STATIC_ROOT = "/opt/sl_tom/static"
+STATIC_ROOT = "/srv/sl_tom/static"
 STATIC_URL = "/"
 
-MEDIA_ROOT = "/opt/sl_tom/media"
+MEDIA_ROOT = "/srv/sl_tom/media"
 
 # CELERY_BROKER_URL = (
 #     f'amqp://{os.environ["CELERY_RABBITMQ_USER"]}:{os.environ["CELERY_RABBITMQ_PASS"]}'
