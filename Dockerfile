@@ -7,7 +7,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install \
-    pipenv
+    pipenv \
+    psycopg2
 
 WORKDIR /usr/src/app
 
