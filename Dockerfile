@@ -6,6 +6,7 @@ RUN apt-get update \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
+# For some reason pipenv can't install psycopg2
 RUN pip install \
     pipenv \
     psycopg2
