@@ -28,18 +28,16 @@ http {
   }
 
   server {
-    listen 80 default_server;
-    return 301 https://www.example.org$request_uri;
-  }
-
-  server {
     # use 'listen 80 deferred;' for Linux
     # use 'listen 80 accept_filter=httpready;' for FreeBSD
-    listen 80;
-    client_max_body_size 4G;
+    listen 443 ssl default_server;
+    server_name tom.black-hole-hunters.org;
 
-    # set the correct host(s) for your site
-    server_name www.example.org;
+    ssl_certificate /etc/tls/certs/tom.black-hole-hunters.org.pem;
+    ssl_certificate_key /etc/tls/private/tom.black-hole-hunters.org.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    client_max_body_size 4G;
 
     keepalive_timeout 5;
 
