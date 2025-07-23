@@ -11,7 +11,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "tom.black-hole-hunters.org",
+    "https://tom.black-hole-hunters.org",
 ]
 
 DATABASES = {
