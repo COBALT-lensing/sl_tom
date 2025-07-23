@@ -7,6 +7,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     "tom.black-hole-hunters.org",
+    "0.0.0.0",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
