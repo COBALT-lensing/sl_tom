@@ -12,6 +12,7 @@ python-dateutil = "*"
 tqdm = "*"
 tornado = "*"
 gunicorn = "*"
+sentry-sdk = {extras = ["django"], version = "*"}
 
 [dev-packages]
 
