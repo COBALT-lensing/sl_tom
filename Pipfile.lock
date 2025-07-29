@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1e028f15d39e1ce094e2a625916fb000b2211f9f13bcf643272a309ac0975bd7"
+            "sha256": "d93c5b4ab38ec4ec710aeccebc93f742c6d009a0253628b3adb4aefdba16ed7c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -240,11 +240,11 @@
         },
         "astropy-iers-data": {
             "hashes": [
-                "sha256:1a5bbb3be6eb02c227ccc2549e22f322e64a5a6bc635b5baf34e214b28b621da",
-                "sha256:e482753c9d6979165be5a47e14a29650026579988a5f0656e52a962e07040a93"
+                "sha256:615b23572553ab2156131ccc6577be2f7528d79326bcde17ab788374aca085b2",
+                "sha256:ed2ee1139f7838ce1e46cdc0024a7c169235f765a3e73b36d45ab6412cbbbb98"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==0.2025.7.21.0.41.39"
+            "version": "==0.2025.7.28.0.41.50"
         },
         "astroquery": {
             "hashes": [
@@ -686,6 +686,7 @@
                 "sha256:4086e7eb9e965f79c4ac76f5c3690ec3bf41c461585237b71b4bde729ced9826",
                 "sha256:b3648e28bdcda809cb7831f3aff98aa46c327025447c462b8943cce9dfbb0281"
             ],
+            "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==0.6.1"
         },

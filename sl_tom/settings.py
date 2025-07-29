@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     "tom_catalogs",
     "tom_observations",
     "tom_dataproducts",
+    "django_tasks",
+    "django_tasks.backends.database",
     "zooniverse",
 ]
 
@@ -184,6 +186,13 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
         "LOCATION": tempfile.gettempdir(),
+    }
+}
+
+TASKS = {
+    "default": {
+        "BACKEND": "django_tasks.backends.database.DatabaseBackend"
+        # "BACKEND": "django_tasks.backends.immediate.ImmediateBackend"
     }
 }
 

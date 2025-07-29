@@ -13,6 +13,7 @@ tqdm = "*"
 tornado = "*"
 gunicorn = "*"
 sentry-sdk = {extras = ["django"], version = "*"}
+django-tasks = "*"
 
 [dev-packages]
 
