@@ -44,6 +44,9 @@ class Command(BaseCommand):
             for tar_member in tqdm(tar):
                 if not tar_member.name.endswith(".json"):
                     continue
+                if "/._" in tar_member.name:
+                    # Skip resource forks
+                    continue
 
                 metadata = json.load(tar.extractfile(tar_member))
 
