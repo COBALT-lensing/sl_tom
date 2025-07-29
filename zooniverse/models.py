@@ -7,6 +7,9 @@ class ZooniverseSurvey(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class ZooniverseTarget(models.Model):
     survey = models.ForeignKey(ZooniverseSurvey, on_delete=models.CASCADE)
@@ -14,6 +17,9 @@ class ZooniverseTarget(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.survey} {self.identifier}"
 
 
 class ZooniverseSubject(models.Model):
