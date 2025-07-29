@@ -13,12 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.urls import path, include
 
-def trigger_error(request):
-    division_by_zero = 1 / 0
-
 urlpatterns = [
-    path('', include('tom_common.urls')),
-    path('sentry-debug/', trigger_error),
+    path("", include("tom_common.urls")),
 ]
