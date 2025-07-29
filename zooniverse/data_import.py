@@ -81,6 +81,7 @@ def import_subjects(
     survey_identifier=None,
     sequence=None,
     sequence_identifier=None,
+    limit=None,
 ):
     """
     Downloads the latest subjects export and creates new ZooniverseSubject objects.
@@ -108,7 +109,7 @@ def import_subjects(
 
     count = 0
     for s in get_subject_export():
-        if count > 100:
+        if limit is not None and count > limit:
             break
         subject_id = int(s["subject_id"])
 
