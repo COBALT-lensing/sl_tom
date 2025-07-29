@@ -5,7 +5,7 @@
 <ul>
     {% for object in object_list %}
     <li>
-        <a href="{% url 'zooniverse_target_detail' object.pk %}">
+        <a href="{% url 'zooniverse:zooniverse_target_detail' object.pk %}">
             {{ object }}
         </a>
     </li>

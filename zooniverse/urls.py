@@ -18,11 +18,13 @@ from django.urls import path, include
 
 from zooniverse.views import ZooniverseTargetListView, ZooniverseTargetDetailView
 
+app_name = "zooniverse"
 
 urlpatterns = [
-    path("", ZooniverseTargetListView.as_view(), name="zooniversetarget_list"),
+    path("", ZooniverseTargetListView.as_view(), name="index"),
+    path("targets", ZooniverseTargetListView.as_view(), name="zooniversetarget_list"),
     path(
-        "<int:pk>/",
+        "targets/<int:pk>/",
         ZooniverseTargetDetailView.as_view(),
         name="zooniverse_target_detail",
     ),
