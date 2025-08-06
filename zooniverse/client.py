@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from panoptes_client import Panoptes, Project, Workflow
+from panoptes_client import *
 
 if (
     settings.ZOONIVERSE_CLIENT_ID
