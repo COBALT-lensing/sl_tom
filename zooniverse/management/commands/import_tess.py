@@ -7,8 +7,6 @@ from django.core.management.base import BaseCommand, CommandError
 from pathlib import Path
 from tqdm import tqdm
 
-from sqlite3 import IntegrityError
-
 from zooniverse.models import ZooniverseSurvey, ZooniverseTarget, ZooniverseSubject
 
 
