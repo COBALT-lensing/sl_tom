@@ -1,9 +1,9 @@
 import json
 import logging
 
-from csv import DictReader
-
 from dateutil.parser import parse as date_parse
+
+from tqdm import tqdm
 
 from zooniverse.client import project, workflow
 from zooniverse.models import (
@@ -16,12 +16,16 @@ from zooniverse.models import (
 logger = logging.getLogger(__name__)
 
 
-def generate_subject_export():
-    return project.generate_export("subjects")
+def generate_subject_export(wait=False):
+    project.generate_export("subjects")
+    if wait:
+        project.wait_export("subjects")
 
 
-def generate_classification_export():
-    return project.generate_export("classifications")
+def generate_classification_export(wait=False):
+    workflow.generate_export("classifications")
+    if wait:
+        workflow.wait_export("classifications")
 
 
 def get_subject_export():
@@ -29,50 +33,72 @@ def get_subject_export():
 
 
 def get_classification_export():
-    return project.get_export("classifications").csv_dictreader()
+    return workflow.get_export("classifications").csv_dictreader()
 
 
-def import_classifications():
+def import_classifications(limit=None, warn_missing_subjects=False):
     """
     Downloads the latest workflow classifications export and creates new ZooniverseClassification
     objects based on it.
     """
-    existing_classifications = ZooniverseClassification.objects.all().values_list(
-        "classification_id", flat=True
-    )
-    existing_subjects = ZooniverseSubject.objects.all().values_list(
-        "subject_id", flat=True
-    )
-    for c in get_classification_export():
-        classification_id = int(c["classification_id"])
-        subject_id = int(c["subject_ids"])
-        user_id = c["user_id"]
-        if len(user_id) == 0:
-            user_id = None
-        else:
-            user_id = int(user_id)
+    BATCH_SIZE = 1e5
 
-        if classification_id in existing_classifications:
-            continue
-
-        if subject_id not in existing_subjects:
-            logger.warning(
-                f"Skipping classification {classification_id} for unknown subject {subject_id}"
-            )
-            continue
-
-        subject = ZooniverseSubject.objects.get(subject_id=subject_id)
-
-        annotation = json.loads(c["annotations"])
-        timestamp = date_parse(c["created_at"])
-
-        ZooniverseClassification.objects.create(
-            classification_id=classification_id,
-            subject=subject,
-            user_id=user_id,
-            timestamp=timestamp,
-            annotation=annotation,
+    existing_classifications = list(
+        ZooniverseClassification.objects.all().values_list(
+            "classification_id", flat=True
         )
+    )
+    existing_subjects = dict(
+        ZooniverseSubject.objects.all().values_list("subject_id", "pk")
+    )
+    total = 0
+    i = 0
+    with tqdm(total=limit) as pbar:
+        new_classifications = []
+        for c in get_classification_export():
+            if limit is not None and total + len(new_classifications) >= limit:
+                break
+            classification_id = int(c["classification_id"])
+            subject_id = int(c["subject_ids"])
+            user_id = c["user_id"]
+            if len(user_id) == 0:
+                user_id = None
+            else:
+                user_id = int(user_id)
+
+            if classification_id in existing_classifications:
+                existing_classifications.remove(classification_id)
+                continue
+
+            if subject_id not in existing_subjects:
+                if warn_missing_subjects:
+                    logger.warning(
+                        f"Skipping classification {classification_id} for unknown subject {subject_id}"
+                    )
+                continue
+
+            annotation = json.loads(c["annotations"])
+            timestamp = date_parse(c["created_at"])
+
+            new_classifications.append(
+                ZooniverseClassification(
+                    classification_id=classification_id,
+                    subject_id=existing_subjects[subject_id],
+                    user_id=user_id,
+                    timestamp=timestamp,
+                    annotation=annotation,
+                )
+            )
+            pbar.update(1)
+            i += 1
+            if i >= BATCH_SIZE:
+                total += len(
+                    ZooniverseClassification.objects.bulk_create(new_classifications)
+                )
+                new_classifications = []
+                i = 0
+    total += len(ZooniverseClassification.objects.bulk_create(new_classifications))
+    return total
 
 
 def import_subjects(
@@ -108,7 +134,7 @@ def import_subjects(
     existing_subjects = existing_subjects.values_list("subject_id", flat=True)
 
     count = 0
-    for s in get_subject_export():
+    for s in tqdm(get_subject_export(), total=limit):
         if limit is not None and count > limit:
             break
         subject_id = int(s["subject_id"])
@@ -154,3 +180,4 @@ def import_subjects(
             sequence=sequence_name,
         )
         count += 1
+    return count

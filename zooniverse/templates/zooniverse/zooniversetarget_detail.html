@@ -14,13 +14,8 @@
     <h3>Subjects</h3>
     <ul>
         {% for subject in object.zooniversesubject_set.all %}
-        <li>{{ subject.subject_id }} (<a href="{{ subject.talk_url }}">Zooniverse Talk</a>)
-            <ul>
-                {% for k, v in subject.annotation_totals.items %}
-                <li>{{ k }}: {{ v }}</li>
-                {% endfor %}
-            </ul>
-        </li>
+        <li>{{ subject.subject_id }}&nbsp;&middot; {{ subject.annotation_count }} annotations (<a
+                href="{{ subject.talk_url }}">Zooniverse Talk</a>)</li>
         {% empty %}
         <li>No subjects found.</li>
         {% endfor %}

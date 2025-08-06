@@ -46,19 +46,20 @@ class ZooniverseSubject(models.Model):
     def talk_url(self):
         return f"https://www.zooniverse.org/projects/{project.slug}/talk/subjects/{self.subject_id}"
 
-    def annotation_totals(self):
-        annotations = self.zooniverseclassification_set.values_list(
-            "annotation", flat=True
-        )
-        annotations = [a[0]["value"] for a in annotations]
-        return dict(Counter(annotations))
+    @property
+    def annotations(self):
+        return self.zooniverseclassification_set.values_list("annotation", flat=True)
+
+    @property
+    def annotation_count(self):
+        return len(self.annotations)
 
 
 class ZooniverseClassification(models.Model):
     classification_id = models.BigIntegerField(unique=True)
     subject = models.ForeignKey(ZooniverseSubject, on_delete=models.CASCADE)
 
-    user_id = models.BigIntegerField()
+    user_id = models.BigIntegerField(null=True, blank=True)
     timestamp = models.DateTimeField()
     annotation = models.JSONField()
 
