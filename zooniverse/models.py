@@ -50,11 +50,10 @@ class ZooniverseTarget(models.Model):
         return f"{self.survey} {self.identifier}"
 
     def aggregated_annotations(self):
-        return (
-            self.zooniversetargetreduction_set.order_by("-created")
-            .first()
-            .reduced_annotations
-        )
+        tr = self.zooniversetargetreduction_set.order_by("-created").first()
+        if tr is None:
+            return None
+        return tr.reduced_annotations
 
     def annotations(self):
         return self.classifications().values_list("annotation", flat=True)
