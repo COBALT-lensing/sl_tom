@@ -1,9 +1,10 @@
 #!/bin/bash -ex
 
-MGMT="python manage.py --settings=sl_tom.settings_production"
+MGMT="python manage.py"
+SETTINGS="--settings=sl_tom.settings_production"
 
-$MGMT fetch_classifications --generate
+$MGMT fetch_classifications $SETTINGS --generate
 
-$MGMT prune_stale_aggregations
+$MGMT prune_stale_aggregations $SETTINGS
 
-$MGMT aggregate_targets
+$MGMT aggregate_targets $SETTINGS
