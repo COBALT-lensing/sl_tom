@@ -6,7 +6,7 @@
     {% for object in object_list %}
     <li>
         <a href="{% url 'zooniverse:zooniverse_target_detail' object.pk %}">
-            {{ object }}
+            <img src="{{object.lightcurve_image.url}}" style="width: 10%;"> {{ object }}
         </a>
     </li>
     {% empty %}

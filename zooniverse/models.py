@@ -1,10 +1,12 @@
 from astropy import units
 
+from django.core.files.base import ContentFile
 from django.db import models
 
 from lightkurve.io.tess import read_tess_lightcurve
 
 from zooniverse.client import project
+from zooniverse.lightcurve import generate_image
 
 
 def fetch_tess_data(data_uri):
@@ -39,9 +41,17 @@ class ZooniverseSurvey(models.Model):
         return self.FETCH_DATA_METHODS[self.fetch_data_method](data_uri)
 
 
+def zooniversetarget_lightcurve_image_path(instance, filename):
+    return f"target_lightcurves/{str(instance.pk)[:3]}/{instance.pk}/{filename}"
+
+
 class ZooniverseTarget(models.Model):
     survey = models.ForeignKey(ZooniverseSurvey, on_delete=models.CASCADE)
     identifier = models.CharField(max_length=128)
+
+    generated_lightcurve_image = models.ImageField(
+        null=True, upload_to=zooniversetarget_lightcurve_image_path
+    )
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -69,6 +79,28 @@ class ZooniverseTarget(models.Model):
 
     def fetch_data(self):
         return self.survey.fetch_data(self.data_url)
+
+    def generate_lightcurve_image(self):
+        annotations = self.aggregated_annotations()
+        if len(annotations) > 0:
+            highlights = list(
+                zip(annotations["x_min"], annotations["x_mid"], annotations["x_max"])
+            )
+        else:
+            highlights = None
+        fig = generate_image(
+            self.fetch_data(),
+            highlights=highlights,
+        )
+        image_data = ContentFile(b"")
+        fig.savefig(image_data)
+        self.generated_lightcurve_image.save("lightcurve.png", image_data)
+
+    @property
+    def lightcurve_image(self):
+        if not self.generated_lightcurve_image:
+            self.generate_lightcurve_image()
+        return self.generated_lightcurve_image
 
 
 class ZooniverseSubject(models.Model):

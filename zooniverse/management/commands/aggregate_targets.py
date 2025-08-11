@@ -15,4 +15,7 @@ class Command(BaseCommand):
         )
         targets = ZooniverseTarget.objects.exclude(pk__in=aggregated_targets)
         for target in tqdm(targets, total=targets.count()):
+            if target.generated_lightcurve_image:
+                target.generated_lightcurve_image.delete()
             PeakGrouperTargetAggregator(target).save()
+            target.generate_lightcurve_image()
