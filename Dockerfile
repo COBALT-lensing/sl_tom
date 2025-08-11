@@ -32,12 +32,6 @@ RUN --mount=type=cache,target=$POETRY_HOME/pypoetry/cache \
 FROM base as production
 WORKDIR /usr/src/app
 
-# RUN poetry config virtualenvs.options.system-site-packages true
-
-# COPY ./poetry.lock ./pyproject.toml ./
-
-# RUN poetry install --no-root
-
 COPY --from=builder $VENV_PATH $VENV_PATH
 
 COPY . .
