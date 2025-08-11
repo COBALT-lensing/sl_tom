@@ -22,9 +22,8 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--generate",
-            type=bool,
-            default=False,
             help="Generate a new classifications export and wait for it before importing",
+            action="store_true",
         )
 
     def handle(self, *args, **options):
