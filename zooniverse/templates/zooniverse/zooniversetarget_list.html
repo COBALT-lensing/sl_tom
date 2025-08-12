@@ -11,7 +11,10 @@
     {% for object in object_list %}
     <li>
         <a href="{% url 'zooniverse:zooniversetarget_detail' object.pk %}">
-            <img src="{{object.lightcurve_image.url}}" style="width: 10%;"> {{ object }}
+            {% if object.lightcurve_image %}
+            <img src="{{object.lightcurve_image.url}}" style="width: 10%;">
+            {% endif %}
+            {{ object }}
         </a>
     </li>
     {% empty %}

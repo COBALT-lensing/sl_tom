@@ -11,7 +11,9 @@
         <li><strong>Updated:</strong> {{ object.updated }}</li>
         <li><strong>Total classifications:</strong> {{ object.classifications.count }}</li>
     </ul>
+    {% if object.lightcurve_image %}
     <div><img src="{{object.lightcurve_image.url}}" style="width: 100%;"></div>
+    {% endif %}
     <h3>Subjects</h3>
     <ul>
         {% for subject in object.zooniversesubject_set.all %}
