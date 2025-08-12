@@ -1,5 +1,7 @@
 import json
 import logging
+import requests
+import time
 
 from dateutil.parser import parse as date_parse
 
@@ -43,60 +45,68 @@ def import_classifications(limit=None, warn_missing_subjects=False):
     """
     BATCH_SIZE = 1e5
 
-    existing_classifications = list(
-        ZooniverseClassification.objects.all().values_list(
-            "classification_id", flat=True
-        )
-    )
-    existing_subjects = dict(
-        ZooniverseSubject.objects.all().values_list("subject_id", "pk")
-    )
     total = 0
     i = 0
     with tqdm(total=limit) as pbar:
         new_classifications = []
-        for c in get_classification_export():
-            if limit is not None and total + len(new_classifications) >= limit:
-                break
-            classification_id = int(c["classification_id"])
-            subject_id = int(c["subject_ids"])
-            user_id = c["user_id"]
-            if len(user_id) == 0:
-                user_id = None
-            else:
-                user_id = int(user_id)
-
-            if classification_id in existing_classifications:
-                existing_classifications.remove(classification_id)
-                continue
-
-            if subject_id not in existing_subjects:
-                if warn_missing_subjects:
-                    logger.warning(
-                        f"Skipping classification {classification_id} for unknown subject {subject_id}"
-                    )
-                continue
-
-            annotation = json.loads(c["annotations"])
-            timestamp = date_parse(c["created_at"])
-
-            new_classifications.append(
-                ZooniverseClassification(
-                    classification_id=classification_id,
-                    subject_id=existing_subjects[subject_id],
-                    user_id=user_id,
-                    timestamp=timestamp,
-                    annotation=annotation,
+        for attempt in range(5):
+            existing_classifications = list(
+                ZooniverseClassification.objects.all().values_list(
+                    "classification_id", flat=True
                 )
             )
-            pbar.update(1)
-            i += 1
-            if i >= BATCH_SIZE:
-                total += len(
-                    ZooniverseClassification.objects.bulk_create(new_classifications)
-                )
-                new_classifications = []
-                i = 0
+            existing_subjects = dict(
+                ZooniverseSubject.objects.all().values_list("subject_id", "pk")
+            )
+            try:
+                for c in get_classification_export():
+                    if limit is not None and total + len(new_classifications) >= limit:
+                        break
+                    classification_id = int(c["classification_id"])
+                    subject_id = int(c["subject_ids"])
+                    user_id = c["user_id"]
+                    if len(user_id) == 0:
+                        user_id = None
+                    else:
+                        user_id = int(user_id)
+
+                    if classification_id in existing_classifications:
+                        existing_classifications.remove(classification_id)
+                        continue
+
+                    if subject_id not in existing_subjects:
+                        if warn_missing_subjects:
+                            logger.warning(
+                                f"Skipping classification {classification_id} for unknown subject {subject_id}"
+                            )
+                        continue
+
+                    annotation = json.loads(c["annotations"])
+                    timestamp = date_parse(c["created_at"])
+
+                    new_classifications.append(
+                        ZooniverseClassification(
+                            classification_id=classification_id,
+                            subject_id=existing_subjects[subject_id],
+                            user_id=user_id,
+                            timestamp=timestamp,
+                            annotation=annotation,
+                        )
+                    )
+                    pbar.update(1)
+                    i += 1
+                    if i >= BATCH_SIZE:
+                        total += len(
+                            ZooniverseClassification.objects.bulk_create(
+                                new_classifications
+                            )
+                        )
+                        new_classifications = []
+                        i = 0
+            except requests.RequestException:
+                time.sleep(attempt * 60)
+                continue
+            break
     total += len(ZooniverseClassification.objects.bulk_create(new_classifications))
     return total
 
