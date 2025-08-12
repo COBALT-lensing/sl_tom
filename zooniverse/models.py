@@ -102,7 +102,10 @@ class ZooniverseTarget(models.Model):
             highlights=highlights,
         )
         image_data = ContentFile(b"")
-        fig.savefig(image_data)
+        try:
+            fig.savefig(image_data)
+        except:
+            return
         self.generated_lightcurve_image.save("lightcurve.png", image_data)
         pyplot.close(fig=fig)
 
