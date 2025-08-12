@@ -166,7 +166,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 MEDIA_ROOT = os.path.join(BASE_DIR, "data")
-MEDIA_URL = "/data/"
+MEDIA_URL = "/media/"
 
 LOGGING = {
     "version": 1,
