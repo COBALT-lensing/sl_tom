@@ -15,7 +15,7 @@ from django.urls import reverse
 def fetch_tess_data(data_uri):
     try:
         ts = read_tess_lightcurve(data_uri)
-    except FileNotFoundError:
+    except (FileNotFoundError, ValueError, TypeError):
         return None
     # Trim the first few hours from the start as loads of SPOC light curves seem to start with spurious peaks
     ts = ts[ts["time"] > ts["time"][0] + 3 * units.hour]
