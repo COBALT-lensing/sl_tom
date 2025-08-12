@@ -18,7 +18,6 @@ RUN apt-get update \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install psycopg2
 
 FROM base as builder
 RUN --mount=type=cache,target=/root/.cache \
@@ -27,7 +26,7 @@ WORKDIR $PYSETUP_PATH
 COPY ./poetry.lock ./pyproject.toml ./
 RUN --mount=type=cache,target=$POETRY_HOME/pypoetry/cache \
     poetry install --no-root
-
+RUN poetry add psycopg2
 
 FROM base as production
 WORKDIR /usr/src/app
