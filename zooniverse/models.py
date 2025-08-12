@@ -7,10 +7,14 @@ from lightkurve.io.tess import read_tess_lightcurve
 
 from zooniverse.client import project
 from zooniverse.lightcurve import generate_image
+from django.urls import reverse
 
 
 def fetch_tess_data(data_uri):
-    ts = read_tess_lightcurve(data_uri)
+    try:
+        ts = read_tess_lightcurve(data_uri)
+    except FileNotFoundError:
+        return None
     # Trim the first few hours from the start as loads of SPOC light curves seem to start with spurious peaks
     ts = ts[ts["time"] > ts["time"][0] + 3 * units.hour]
     return ts
@@ -82,25 +86,34 @@ class ZooniverseTarget(models.Model):
 
     def generate_lightcurve_image(self):
         annotations = self.aggregated_annotations()
-        if len(annotations) > 0:
+        if annotations and len(annotations) > 0:
             highlights = list(
                 zip(annotations["x_min"], annotations["x_mid"], annotations["x_max"])
             )
         else:
             highlights = None
+        data = self.fetch_data()
+        if data is None:
+            return
         fig = generate_image(
-            self.fetch_data(),
+            data,
             highlights=highlights,
         )
         image_data = ContentFile(b"")
         fig.savefig(image_data)
         self.generated_lightcurve_image.save("lightcurve.png", image_data)
+        fig.close()
+
+    def get_absolute_url(self):
+        return reverse("zooniverse:zooniverse_target_detail", args=[str(self.pk)])
 
     @property
     def lightcurve_image(self):
         if not self.generated_lightcurve_image:
             self.generate_lightcurve_image()
-        return self.generated_lightcurve_image
+        if self.generated_lightcurve_image:
+            return self.generated_lightcurve_image
+        return None
 
 
 class ZooniverseSubject(models.Model):

@@ -2,10 +2,15 @@
 
 {% block content %}
 <h1>Zooniverse Target List</h1>
+
+<form method="get">
+    {{ target_lookup_form }}
+    <input type="submit" value="Lookup">
+</form>
 <ul>
     {% for object in object_list %}
     <li>
-        <a href="{% url 'zooniverse:zooniverse_target_detail' object.pk %}">
+        <a href="{% url 'zooniverse:zooniversetarget_detail' object.pk %}">
             <img src="{{object.lightcurve_image.url}}" style="width: 10%;"> {{ object }}
         </a>
     </li>
