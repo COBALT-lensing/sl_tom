@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -x
 
 MGMT="python manage.py"
 SETTINGS="--settings=sl_tom.settings_production"
