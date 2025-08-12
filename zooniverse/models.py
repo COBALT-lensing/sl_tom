@@ -5,6 +5,8 @@ from django.db import models
 
 from lightkurve.io.tess import read_tess_lightcurve
 
+from matplotlib import pyplot
+
 from zooniverse.client import project
 from zooniverse.lightcurve import generate_image
 from django.urls import reverse
@@ -102,7 +104,7 @@ class ZooniverseTarget(models.Model):
         image_data = ContentFile(b"")
         fig.savefig(image_data)
         self.generated_lightcurve_image.save("lightcurve.png", image_data)
-        fig.close()
+        pyplot.close(fig=fig)
 
     def get_absolute_url(self):
         return reverse("zooniverse:zooniverse_target_detail", args=[str(self.pk)])
