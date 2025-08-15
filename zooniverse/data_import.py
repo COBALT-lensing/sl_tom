@@ -15,6 +15,7 @@ from zooniverse.models import (
     ZooniverseSubject,
     ZooniverseTarget,
     ZooniverseSurvey,
+    ZooniverseSubjectSet,
 )
 
 logger = logging.getLogger(__name__)
@@ -159,17 +160,27 @@ def import_subjects(
         else:
             retired_at = None
 
+        subject_set_id = int(s["subject_set_id"])
+        subject_set, _ = ZooniverseSubjectSet.objects.get_or_create(
+            subject_set_id=subject_set_id
+        )
+
         try:
             s = ZooniverseSubject.objects.get(subject_id=subject_id)
+            changed = False
+            if s.subject_set != subject_set:
+                s.subject_set = subject_set
+                changed = True
             if s.retired_at != retired_at:
                 s.retired_at = retired_at
+                changed = True
+            if changed:
                 s.save()
                 updated_count += 1
             continue
         except ZooniverseSubject.DoesNotExist:
             pass
 
-        subject_set_id = int(s["subject_set_id"])
         locations = json.loads(s["locations"])
         metadata = json.loads(s["metadata"])
 
@@ -204,7 +215,7 @@ def import_subjects(
 
         ZooniverseSubject.objects.create(
             subject_id=subject_id,
-            subject_set_id=subject_set_id,
+            subject_set=subject_set,
             metadata=s["metadata"],
             retired_at=retired_at,
             data_url=locations["0"],

@@ -1,7 +1,11 @@
 from astropy import units
 
+from collections import Counter
+
 from django.core.files.base import ContentFile
 from django.db import models
+from django.db.models import Count
+from django.urls import reverse
 
 from lightkurve.io.tess import read_tess_lightcurve
 
@@ -9,7 +13,6 @@ from matplotlib import pyplot
 
 from zooniverse.client import project
 from zooniverse.lightcurve import generate_image
-from django.urls import reverse
 
 
 def fetch_tess_data(data_uri):
@@ -127,6 +130,30 @@ class ZooniverseTarget(models.Model):
 
 class ZooniverseSubjectSet(models.Model):
     subject_set_id = models.IntegerField()
+
+    @classmethod
+    def active(cls):
+        return cls.objects.filter(
+            pk__in=ZooniverseSubject.objects.filter(retired_at=None)
+            .values_list("subject_set_id", flat=True)
+            .distinct()
+        )
+
+    def active_subjects(self):
+        return self.zooniversesubject_set.exclude(retired_at=None)
+
+    def retired_subjects(self):
+        return self.zooniversesubject_set.filter(retired_at=None)
+
+    def classification_count_distribution(self):
+        subjects = self.zooniversesubject_set.annotate(
+            num_classifications=Count("zooniverseclassification")
+        )
+
+        distribution = Counter(
+            dict(subjects.values_list("subject_id", "num_classifications")).values()
+        )
+        return distribution
 
 
 class ZooniverseSubject(models.Model):
