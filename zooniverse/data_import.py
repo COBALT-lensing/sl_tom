@@ -5,6 +5,8 @@ import time
 
 from dateutil.parser import parse as date_parse
 
+from django.conf import settings
+
 from tqdm import tqdm
 
 from zooniverse.client import project, workflow
@@ -138,20 +140,36 @@ def import_subjects(
     if survey is not None:
         survey = ZooniverseSurvey.objects.get_or_create(name=survey)[0]
 
-    existing_subjects = ZooniverseSubject.objects.all()
-    if survey is not None:
-        existing_subjects = existing_subjects.filter(target__survey=survey)
-    existing_subjects = existing_subjects.values_list("subject_id", flat=True)
-
-    count = 0
+    created_count = 0
+    updated_count = 0
     for s in tqdm(get_subject_export(), total=limit):
-        if limit is not None and count > limit:
+        if limit is not None and created_count > limit:
             break
         subject_id = int(s["subject_id"])
 
-        if subject_id in existing_subjects:
+        if (
+            len(s["workflow_id"]) == 0
+            or int(s["workflow_id"]) != settings.ZOONIVERSE_WORKFLOW_ID
+        ):
             continue
 
+        retired_at = s["retired_at"]
+        if len(retired_at) > 0:
+            retired_at = date_parse(s["retired_at"])
+        else:
+            retired_at = None
+
+        try:
+            s = ZooniverseSubject.objects.get(subject_id=subject_id)
+            if s.retired_at != retired_at:
+                s.retired_at = retired_at
+                s.save()
+                updated_count += 1
+            continue
+        except ZooniverseSubject.DoesNotExist:
+            pass
+
+        subject_set_id = int(s["subject_set_id"])
         locations = json.loads(s["locations"])
         metadata = json.loads(s["metadata"])
 
@@ -173,6 +191,8 @@ def import_subjects(
             target = ZooniverseTarget.objects.get_or_create(
                 survey=survey, identifier=target_name
             )[0]
+        if target is None:
+            continue
 
         sequence_name = None
         if sequence_identifier is not None:
@@ -184,10 +204,12 @@ def import_subjects(
 
         ZooniverseSubject.objects.create(
             subject_id=subject_id,
+            subject_set_id=subject_set_id,
             metadata=s["metadata"],
+            retired_at=retired_at,
             data_url=locations["0"],
             target=target,
             sequence=sequence_name,
         )
-        count += 1
-    return count
+        created_count += 1
+    return created_count, updated_count

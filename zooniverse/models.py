@@ -125,11 +125,20 @@ class ZooniverseTarget(models.Model):
         return None
 
 
+class ZooniverseSubjectSet(models.Model):
+    subject_set_id = models.IntegerField()
+
+
 class ZooniverseSubject(models.Model):
     subject_id = models.BigIntegerField(unique=True)
+    subject_set = models.ForeignKey(
+        ZooniverseSubjectSet, null=True, blank=True, on_delete=models.CASCADE
+    )
     target = models.ForeignKey(ZooniverseTarget, on_delete=models.CASCADE)
 
-    sequence = models.CharField(max_length=50, help_text="Sector, data release, etc.")
+    sequence = models.CharField(
+        max_length=50, null=True, blank=True, help_text="Sector, data release, etc."
+    )
     data_url = models.URLField(null=True, blank=True)
     start_time = models.DateTimeField(
         null=True, blank=True, help_text="Earliest time in the light curve"
@@ -139,6 +148,8 @@ class ZooniverseSubject(models.Model):
     )
 
     metadata = models.JSONField()
+
+    retired_at = models.DateTimeField(null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
