@@ -105,9 +105,11 @@ class ZooniverseTarget(models.Model):
         try:
             fig.savefig(image_data)
         except:
-            return
-        self.generated_lightcurve_image.save("lightcurve.png", image_data)
-        pyplot.close(fig=fig)
+            pass
+        else:
+            self.generated_lightcurve_image.save("lightcurve.png", image_data)
+        finally:
+            pyplot.close(fig=fig)
 
     def get_absolute_url(self):
         return reverse("zooniverse:zooniverse_target_detail", args=[str(self.pk)])
