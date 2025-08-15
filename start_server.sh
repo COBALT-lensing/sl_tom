@@ -10,7 +10,7 @@ if [ "$DJANGO_ENV" == "production" ]; then
     python manage.py collectstatic --clear --no-input
   fi
   echo Starting production server
-  exec gunicorn sl_tom.wsgi -b 0:8080 --access-logfile - --capture-output
+  exec gunicorn sl_tom.wsgi -b 0:8080 -t 120 --access-logfile - --capture-output
 else
   echo Applying migrations
   python manage.py migrate --noinput
