@@ -107,7 +107,9 @@ class ZooniverseTarget(models.Model):
         except:
             pass
         else:
-            self.generated_lightcurve_image.save("lightcurve.png", image_data)
+            self.generated_lightcurve_image.save(
+                "lightcurve.png", image_data, save=True
+            )
         finally:
             pyplot.close(fig=fig)
 
